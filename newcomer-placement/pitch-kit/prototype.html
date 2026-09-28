@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waypoint Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@500;700;800&display=swap">
+<style>
+/* Layout: app shell. A transit-style route of 9 stops (the intake flow) runs across the top; each stop is one screen. */
+:root{
+  --bg:#F2F5F4; --surface:#FFFFFF; --ink:#15233A; --muted:#566775; --line:#D3DDDA;
+  --accent:#0C7358; --accent-ink:#FFFFFF; --accent-soft:#DCEFE8;
+  --flag:#9A5B00; --flag-soft:#FAEBD2; --ok:#1B6E35; --ok-soft:#DDF1E2;
+  --font-display:"Schibsted Grotesk","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E151D; --surface:#15202B; --ink:#E4ECEE; --muted:#97A8B3; --line:#2A3A47;
+  --accent:#43C29C; --accent-ink:#0B1A14; --accent-soft:#12372C;
+  --flag:#F0B356; --flag-soft:#3A2B13; --ok:#6FD08C; --ok-soft:#153422; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E151D; --surface:#15202B; --ink:#E4ECEE; --muted:#97A8B3; --line:#2A3A47;
+  --accent:#43C29C; --accent-ink:#0B1A14; --accent-soft:#12372C;
+  --flag:#F0B356; --flag-soft:#3A2B13; --ok:#6FD08C; --ok-soft:#153422; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-body);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:0 40px}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.15}
+h2{font-size:1.6rem;font-weight:800}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+.label{font:500 .72rem/1.2 var(--font-data);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--font-data);font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* top bar */
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding-block:18px 10px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand b{font:800 1.35rem var(--font-display);letter-spacing:-.01em}
+.brand small{color:var(--muted)}
+.sample{font:500 .72rem var(--font-data);letter-spacing:.06em;text-transform:uppercase;background:var(--flag-soft);color:var(--flag);padding:5px 9px;border-radius:99px}
+
+/* route stepper */
+.route{overflow-x:auto;padding-block:8px 16px;margin-inline:-4px}
+.route ol{list-style:none;margin:0;padding:0 4px;display:flex;min-width:760px;position:relative}
+.route ol::before{content:"";position:absolute;left:24px;right:24px;top:15px;height:4px;background:var(--line);border-radius:2px}
+.route li{flex:1;position:relative;text-align:center}
+.route button{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:6px;width:100%;padding:0 2px;font-size:.78rem;line-height:1.2}
+.route .dot{width:34px;height:34px;border-radius:50%;background:var(--surface);border:3px solid var(--line);display:grid;place-items:center;font:500 .8rem var(--font-data);color:var(--muted);position:relative;z-index:1}
+.route li.done .dot{border-color:var(--accent);color:var(--accent)}
+.route li.on .dot{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.route li.on button{color:var(--ink);font-weight:700}
+.route .who{font:500 .64rem var(--font-data);letter-spacing:.05em;text-transform:uppercase;opacity:.8}
+
+/* screens */
+.screen{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:clamp(18px,3vw,32px);display:grid;gap:22px}
+.head{display:grid;gap:6px}
+.head .lede{color:var(--muted);max-width:62ch}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.grid2>*{min-width:0}
+.panel{border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:10px;align-content:start}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pill{font:500 .74rem var(--font-data);padding:4px 9px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pill.flag{background:var(--flag-soft);color:var(--flag)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.plain{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.btn{border:0;border-radius:8px;padding:11px 18px;background:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.note{font-size:.85rem;color:var(--muted);border-left:3px solid var(--flag);padding-left:10px}
+
+/* table */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+th{font:500 .7rem var(--font-data);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+td .mono{font-size:.88rem}
+tr.hl td{background:var(--accent-soft)}
+
+/* forms */
+.field{display:grid;gap:5px}
+.field label{font-weight:700;font-size:.9rem}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:9px 11px;width:100%}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.93rem}
+.check input{width:auto;margin-top:4px}
+.q{display:grid;gap:4px;padding-block:10px;border-bottom:1px dashed var(--line)}
+.q:last-child{border-bottom:0}
+.q .say{font-size:.85rem;color:var(--muted)}
+.q .ans{font-weight:700}
+
+/* student device */
+.device{max-width:560px;width:100%;margin-inline:auto;border:10px solid var(--ink);border-radius:26px;background:var(--bg);padding:22px;display:grid;gap:18px}
+.device .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.progress{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.listen{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:8px 14px;color:var(--ink);font-weight:700}
+.listen svg{width:16px;height:16px;fill:var(--accent)}
+.prompt{font:700 1.5rem/1.2 var(--font-display)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:18px;font:800 2rem var(--font-data);color:var(--ink)}
+.choice.picked{border-color:var(--accent);background:var(--accent-soft)}
+.passage{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;font-size:1.1rem;line-height:1.7}
+.opt{display:block;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--ink)}
+.opt.picked{border-color:var(--accent);background:var(--accent-soft)}
+.gloss{font-size:.85rem;color:var(--muted)}
+svg.nl{width:100%;height:auto;display:block}
+svg.nl text{fill:var(--ink);font:500 14px var(--font-data)}
+svg.nl .axis{stroke:var(--ink);stroke-width:2}
+svg.nl .tick{stroke:var(--ink);stroke-width:1.5}
+svg.nl .mk{fill:var(--accent)}
+
+/* profile */
+.profile{display:grid;gap:18px}
+.ptop{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.fact{display:grid;gap:3px}
+.fact b{font:700 1.05rem var(--font-display)}
+.band{display:grid;gap:6px}
+.scale{display:grid;grid-template-columns:repeat(9,1fr);gap:3px}
+.scale span{height:14px;background:var(--line);border-radius:3px}
+.scale span.in{background:var(--accent)}
+.scale-l{display:grid;grid-template-columns:repeat(9,1fr);font:500 .66rem var(--font-data);color:var(--muted);text-align:center}
+.rec{border:2px solid var(--accent);border-radius:10px;padding:16px;display:grid;gap:10px}
+ul.plain{margin:0;padding-left:18px;display:grid;gap:4px}
+
+/* phone */
+.phone{max-width:380px;width:100%;margin-inline:auto;border:10px solid var(--ink);border-radius:30px;background:var(--bg);padding:16px;display:grid;gap:10px}
+.bubble{background:var(--surface);border:1px solid var(--line);border-radius:14px 14px 14px 4px;padding:12px 14px;font-size:.95rem;white-space:pre-line}
+.bubble.me{background:var(--accent-soft);border-color:transparent;border-radius:14px 14px 4px 14px;justify-self:end;max-width:80%}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ink);padding:7px 14px;font-size:.85rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+/* dashboard */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:14px;display:grid;gap:4px}
+.kpi b{font:800 2rem/1 var(--font-display);font-variant-numeric:tabular-nums}
+.kpi small{color:var(--muted)}
+.bars{display:grid;gap:8px}
+.bar-row{display:grid;grid-template-columns:120px 1fr 32px;gap:10px;align-items:center;font-size:.9rem}
+.bar-row .track{height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar-row .fill{height:100%;background:var(--accent);border-radius:6px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:.9rem;max-width:calc(100% - 32px);z-index:5}
+@media (max-width:520px){
+  .choices{grid-template-columns:1fr 1fr}
+  .bar-row{grid-template-columns:96px 1fr 28px}
+  h2{font-size:1.35rem}
+}
+@media (prefers-reduced-motion:no-preference){.screen{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+
+<div class="wrap">
+  <header class="bar">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="none" stroke="var(--accent)" stroke-width="3"/><circle cx="15" cy="15" r="5" fill="var(--accent)"/></svg>
+      <div><b>Waypoint</b><br><small>Lincoln High School · Newcomer intake</small></div>
+    </div>
+    <span class="sample">Prototype · sample data</span>
+  </header>
+
+  <nav class="route" aria-label="Intake flow">
+    <ol id="route"></ol>
+  </nav>
+
+  <main id="screens">
+
+  <!-- 1 QUEUE -->
+  <section class="screen" data-id="queue" data-title="Intake queue" data-who="Coordinator">
+    <div class="head"><span class="label">Step 1 · Intake coordinator</span><h2>Today's newcomer enrollments</h2>
+      <p class="lede">Each new student gets a starting-point check before placement. The English screener result comes in from the existing test; Waypoint adds math, home-language reading, and schooling history.</p></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Student</th><th>Age</th><th>Home language</th><th>English screener</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <tr class="hl"><td><b>Wislande J.</b></td><td class="mono">16</td><td>Haitian Creole</td><td class="mono">1.8</td><td><span class="pill flag">Check not started</span></td><td><button class="btn" data-go="start">Start check</button></td></tr>
+        <tr><td><b>Kevin A.</b></td><td class="mono">15</td><td>K'iche' · Spanish</td><td class="mono">1.2</td><td><span class="pill">Interview done</span></td><td><button class="btn ghost" data-toast="Kevin's session would resume at the reading task.">Resume</button></td></tr>
+        <tr><td><b>Farida N.</b></td><td class="mono">13</td><td>Dari</td><td class="mono">2.4</td><td><span class="pill ok">Profile ready</span></td><td><button class="btn ghost" data-toast="Farida's profile would open here.">Open</button></td></tr>
+        <tr><td><b>João P.</b></td><td class="mono">17</td><td>Portuguese</td><td class="mono">3.1</td><td><span class="pill plain">Day-30 review due</span></td><td><button class="btn ghost" data-go="review">Review</button></td></tr>
+      </tbody></table></div>
+  </section>
+
+  <!-- 2 START -->
+  <section class="screen" data-id="start" data-title="Start session" data-who="Coordinator" hidden>
+    <div class="head"><span class="label">Step 2 · Intake coordinator</span><h2>Start Wislande's check</h2>
+      <p class="lede">About 45 minutes, in school, with an adult in the room. The guardian hears the consent statement in their language.</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="field"><label for="f-name">Student</label><input id="f-name" value="Wislande J."></div>
+        <div class="field"><label for="f-age">Date of birth</label><input id="f-age" value="2010-05-19 (16 years)"></div>
+        <div class="field"><label for="f-lang">Home language for audio and reading</label>
+          <select id="f-lang"><option selected>Haitian Creole</option><option>Spanish</option><option>Portuguese</option><option>Dari</option><option>Arabic</option><option>K'iche' (audio only)</option></select></div>
+        <div class="field"><label for="f-grade">Grade by age</label><input id="f-grade" value="10"></div>
+      </div>
+      <div class="panel">
+        <h3>Guardian consent</h3>
+        <p>Played aloud in Haitian Creole to Marie (aunt, guardian).</p>
+        <label class="check"><input type="checkbox" id="c1" checked> The check helps the school choose classes. It is not a pass/fail test.</label>
+        <label class="check"><input type="checkbox" id="c2" checked> Results stay with the school district.</label>
+        <label class="check"><input type="checkbox" id="c3" checked> Waypoint never asks about immigration status.</label>
+        <div class="field"><label for="f-phone">Guardian phone for the summary (text or WhatsApp)</label><input id="f-phone" value="(617) 555-0142"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 INTERVIEW -->
+  <section class="screen" data-id="interview" data-title="Schooling interview" data-who="Coordinator" hidden>
+    <div class="head"><span class="label">Step 3 · Coordinator with interpreter · ~10 min</span><h2>Schooling-history interview</h2>
+      <p class="lede">The same questions for every student, based on Massachusetts SLIFE guidance. Each question has a script to read aloud in the home language.</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="q"><span class="label">Q1</span><span>How many years did you go to school?</span><span class="say">Konbyen ane ou te al lekòl?</span><span class="ans">8 years</span></div>
+        <div class="q"><span class="label">Q2</span><span>Were there times you could not go to school? For how long?</span><span class="say">Èske te gen yon moman ou pa t ka al lekòl? Konbyen tan?</span><span class="ans">Yes · 14 months (2023–2024)</span></div>
+        <div class="q"><span class="label">Q3</span><span>What was your last school like?</span><span class="say">Kijan dènye lekòl ou te ye?</span><span class="ans">Public · urban · Port-au-Prince</span></div>
+        <div class="q"><span class="label">Q4</span><span>Which languages can you read and write?</span><span class="say">Nan ki lang ou ka li ak ekri?</span><span class="ans">Haitian Creole, some French</span></div>
+      </div>
+      <div class="panel">
+        <h3>What the form does not ask</h3>
+        <p>No questions about immigration status, visas, or how the family arrived. The form has no fields for them.</p>
+        <h3>Summary so far</h3>
+        <ul class="plain"><li>8 years of schooling, 14-month interruption</li><li>Literate in Haitian Creole; some French</li><li>Last grade completed: roughly 8th</li></ul>
+        <p class="note">Question scripts in Haitian Creole are drafts. A native speaker must review them before use.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 READING -->
+  <section class="screen" data-id="reading" data-title="Reading task" data-who="Student" hidden>
+    <div class="head"><span class="label">Step 4 · Student view · ~10 min</span><h2>Home-language reading</h2>
+      <p class="lede">A short passage in Haitian Creole at one of three levels. The English line under each part is for staff only.</p></div>
+    <div class="device">
+      <div class="top"><span class="label">Lekti · Pasaj 2 sou 3</span><button class="listen" data-toast="In the product, the passage plays aloud in Haitian Creole."><svg viewBox="0 0 16 16"><path d="M3 2l11 6-11 6z"/></svg>Koute</button></div>
+      <div class="progress"><i style="width:66%"></i></div>
+      <div class="passage">Chak maten, Jozèf leve bonè pou l ede manman l nan mache a. Li pote panyen fwi yo sou tèt li. Apre sa, li mache al lekòl. Jozèf renmen matematik paske li ka konte lajan kliyan yo byen vit.
+        <p class="gloss">Staff: Every morning Joseph gets up early to help his mother at the market… He likes math because he can count customers' money quickly.</p></div>
+      <p class="prompt">Poukisa Jozèf renmen matematik?</p>
+      <p class="gloss">Staff: Why does Joseph like math?</p>
+      <div class="bars" role="group" aria-label="Answer choices">
+        <button class="opt" data-pick="r">A. Paske li renmen mache a</button>
+        <button class="opt" data-pick="r">B. Paske li ka konte lajan byen vit</button>
+        <button class="opt" data-pick="r">C. Paske li leve bonè</button>
+      </div>
+      <p class="note">Sample passage and translation are drafts for the prototype.</p>
+    </div>
+  </section>
+
+  <!-- 5 MATH -->
+  <section class="screen" data-id="math" data-title="Math screener" data-who="Student" hidden>
+    <div class="head"><span class="label">Step 5 · Student view · ~20 min, adaptive</span><h2>Visual math screener</h2>
+      <p class="lede">Questions use pictures, numbers and audio, so a student's math isn't hidden behind English. It stops when the starting band is clear.</p></div>
+    <div class="device">
+      <div class="top"><span class="label mono">Matematik · 9 / ~20</span><button class="listen" data-toast="In the product, the question plays aloud in Haitian Creole."><svg viewBox="0 0 16 16"><path d="M3 2l11 6-11 6z"/></svg>Koute</button></div>
+      <div class="progress"><i style="width:45%"></i></div>
+      <p class="prompt">Ki nimewo ki pi gwo?</p>
+      <svg class="nl" viewBox="0 0 520 70" role="img" aria-label="Number line from minus 8 to 2 with minus 7 and minus 3 marked">
+        <line class="axis" x1="20" y1="30" x2="500" y2="30"/>
+        <g id="ticks"></g>
+        <circle class="mk" cx="68" cy="30" r="8"/><circle class="mk" cx="260" cy="30" r="8"/>
+      </svg>
+      <div class="choices">
+        <button class="choice" data-pick="m">−7</button>
+        <button class="choice" data-pick="m">−3</button>
+      </div>
+      <p class="gloss">Staff: "Which number is greater?" Skill: comparing integers (grade 6–7).</p>
+    </div>
+  </section>
+
+  <!-- 6 PROFILE -->
+  <section class="screen" data-id="profile" data-title="Starting-Point Profile" data-who="Counselor" hidden>
+    <div class="profile">
+      <div class="ptop">
+        <div class="head"><span class="label">Step 6 · Counselor · Starting-Point Profile</span><h2>Wislande J.</h2><p class="lede">Enrolled 28 Sep 2026 · Age 16 · Haitian Creole · Grade by age: 10</p></div>
+        <div class="row"><span class="pill">Confidence: medium</span><span class="pill plain">Does not meet SLIFE criteria</span></div>
+      </div>
+      <div class="facts">
+        <div class="fact"><span class="label">Schooling</span><b>8 years</b><small>14-month interruption</small></div>
+        <div class="fact"><span class="label">English screener</span><b class="mono">1.8</b><small>Entering (existing test)</small></div>
+        <div class="fact"><span class="label">Home-language reading</span><b>Level 3 of 4</b><small>Reads grade-level text</small></div>
+        <div class="fact"><span class="label">Math starting band</span><b>Grade 6–7</b><small>18 items · 22 min</small></div>
+      </div>
+      <div class="grid2">
+        <div class="panel band">
+          <h3>Math by grade band</h3>
+          <div class="scale" aria-label="Math starting band grade 6 to 7 on a scale of grade 3 to 11"><span></span><span></span><span></span><span class="in"></span><span class="in"></span><span></span><span></span><span></span><span></span></div>
+          <div class="scale-l"><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span></div>
+          <p><b>Strong:</b> whole-number operations, fractions, ratios.</p>
+          <p><b>Gaps:</b> negative numbers, algebraic expressions.</p>
+        </div>
+        <div class="rec">
+          <span class="label">Suggested placement · staff decide</span>
+          <ul class="plain">
+            <li>Grade 10 (age-appropriate) with newcomer ESL 1</li>
+            <li>Foundations of Algebra with integer support, not 9th-grade general math</li>
+            <li>Content support in Haitian Creole where available</li>
+            <li>Eligible to test for world-language credit in French or Haitian Creole (district policy)</li>
+          </ul>
+          <div class="field"><label for="f-decision">Counselor decision</label>
+            <select id="f-decision"><option selected>Accept suggested placement</option><option>Adjust placement</option></select></div>
+        </div>
+      </div>
+      <p class="note">Why these suggestions: age 16 with 8 years of school and grade 6–7 math means placing by age with math support. Placing her in 9th grade would make her two years older than her classmates.</p>
+    </div>
+  </section>
+
+  <!-- 7 FAMILY -->
+  <section class="screen" data-id="family" data-title="Family summary" data-who="Guardian" hidden>
+    <div class="head"><span class="label">Step 7 · Guardian · same day</span><h2>Family summary by text</h2>
+      <p class="lede">Sent in the family's language. Replies go to the intake coordinator.</p>
+      <div class="seg" role="group" aria-label="Message language"><button id="lang-ht" aria-pressed="true">Kreyòl ayisyen</button><button id="lang-en" aria-pressed="false">English</button></div></div>
+    <div class="phone">
+      <span class="label">Lincoln High · Enskripsyon</span>
+      <div class="bubble" id="msg"></div>
+      <div class="bubble me" id="reply"></div>
+      <p class="note">Haitian Creole text is a draft. A native speaker must review it before use.</p>
+    </div>
+  </section>
+
+  <!-- 8 REVIEW -->
+  <section class="screen" data-id="review" data-title="Day-30 review" data-who="Teacher" hidden>
+    <div class="head"><span class="label">Step 8 · Teacher · one tap</span><h2>Day-30 placement review</h2>
+      <p class="lede">Thirty days after placement, each teacher confirms or flags it. Wrong first guesses get fixed in October, not June.</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <span class="label">Mr. Alves · Foundations of Algebra</span>
+        <h3>João P. · Portuguese · age 17</h3>
+        <p>Placed 28 Aug. Waypoint math band: grade 8–9.</p>
+        <p>Is this placement right for João?</p>
+        <div class="row">
+          <button class="btn" id="rv-ok">Placement fits</button>
+          <button class="btn ghost" id="rv-up">Move up</button>
+          <button class="btn ghost" id="rv-down">Needs more support</button>
+        </div>
+        <p id="rv-out" class="note" hidden></p>
+      </div>
+      <div class="panel">
+        <h3>Teacher's grouping card</h3>
+        <ul class="plain"><li><b>Group A · integers and expressions:</b> Wislande J., Kevin A.</li><li><b>Group B · linear equations:</b> João P., Farida N.</li></ul>
+        <p class="gloss">Groups come from each student's math band and skill gaps.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 DASHBOARD -->
+  <section class="screen" data-id="dash" data-title="Director dashboard" data-who="Director" hidden>
+    <div class="head"><span class="label">Step 9 · District multilingual director</span><h2>Newcomer placement, 2026–27 so far</h2>
+      <p class="lede">The same measures across every school, so the district can see where placement is consistent and where it isn't.</p></div>
+    <div class="kpis">
+      <div class="kpi"><span class="label">Newcomers checked</span><b>42</b><small>of 44 enrolled</small></div>
+      <div class="kpi"><span class="label">Enrollment to profile</span><b>1 day</b><small>median</small></div>
+      <div class="kpi"><span class="label">SLIFE identified</span><b>9</b><small>21% of checked</small></div>
+      <div class="kpi"><span class="label">Adjusted at day 30</span><b>12%</b><small>5 of 41 reviewed</small></div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h3>Home languages</h3><div class="bars" id="bars"></div></div>
+      <div class="panel"><h3>By school</h3>
+        <div class="tbl"><table style="min-width:360px">
+          <thead><tr><th>School</th><th>Checked</th><th>SLIFE</th><th>Adjusted</th></tr></thead>
+          <tbody class="mono">
+            <tr><td>Lincoln High</td><td>18</td><td>5</td><td>2</td></tr>
+            <tr><td>Central High</td><td>13</td><td>3</td><td>3</td></tr>
+            <tr><td>Roosevelt Middle</td><td>11</td><td>1</td><td>0</td></tr>
+          </tbody></table></div></div>
+    </div>
+  </section>
+  </main>
+
+  <div class="nav"><button class="btn ghost" id="prev">Back</button><button class="btn" id="next">Next step</button></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+  var screens=[].slice.call(document.querySelectorAll('.screen'));
+  var route=document.getElementById('route'), cur=0;
+  screens.forEach(function(s,i){
+    var li=document.createElement('li');
+    li.innerHTML='<button type="button"><span class="dot">'+(i+1)+'</span><span>'+s.dataset.title+'</span><span class="who">'+s.dataset.who+'</span></button>';
+    li.querySelector('button').addEventListener('click',function(){show(i)});
+    route.appendChild(li);
+  });
+  function show(i){
+    cur=Math.max(0,Math.min(screens.length-1,i));
+    screens.forEach(function(s,j){s.hidden=j!==cur});
+    [].forEach.call(route.children,function(li,j){li.className=j<cur?'done':(j===cur?'on':'')});
+    document.getElementById('prev').disabled=cur===0;
+    document.getElementById('next').disabled=cur===screens.length-1;
+    try{history.replaceState(null,'','#'+screens[cur].dataset.id)}catch(e){}
+    var on=route.children[cur]; if(on&&on.scrollIntoView){on.scrollIntoView({block:'nearest',inline:'center'})}
+  }
+  function idx(id){for(var i=0;i<screens.length;i++){if(screens[i].dataset.id===id)return i}return -1}
+  document.getElementById('prev').onclick=function(){show(cur-1)};
+  document.getElementById('next').onclick=function(){show(cur+1)};
+  document.addEventListener('click',function(e){
+    var g=e.target.closest('[data-go]'); if(g){show(idx(g.dataset.go));return}
+    var t=e.target.closest('[data-toast]'); if(t){toast(t.dataset.toast);return}
+    var p=e.target.closest('[data-pick]'); if(p){
+      [].forEach.call(p.parentNode.querySelectorAll('[data-pick]'),function(b){b.classList.remove('picked')});
+      p.classList.add('picked'); toast('Answer recorded. The next question adapts to this one.');
+    }
+  });
+  var tt; function toast(m){var el=document.getElementById('toast');el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(function(){el.hidden=true},2600)}
+
+  // number line ticks, -8..2
+  var g=document.getElementById('ticks'),html='';
+  for(var v=-8;v<=2;v++){var x=20+(v+8)*48;html+='<line class="tick" x1="'+x+'" y1="22" x2="'+x+'" y2="38"/><text x="'+x+'" y="60" text-anchor="middle">'+(v<0?'−'+(-v):v)+'</text>'}
+  g.innerHTML=html;
+
+  // family message
+  var msgs={
+    ht:{m:"Bonjou Marie. Se biwo enskripsyon Lincoln High ki ekri w.\n\nJodi a, Wislande fè yon evalyasyon 45 minit.\n• Matematik: li kòmanse nan nivo 6yèm–7yèm ane. Li fò nan fraksyon. L ap travay sou nonb negatif.\n• Lekti an kreyòl: li li byen (nivo 3 sou 4).\n\nPlasman: 10yèm ane, ak klas anglè pou nouvo elèv ak yon klas matematik ak sipò.\nN ap revize plasman an nan 30 jou.\n\nOu gen kesyon? Reponn mesaj sa a. Dana ap reponn ou.",r:"Mèsi anpil. Èske li ka pran klas franse tou?"},
+    en:{m:"Hello Marie. This is the Lincoln High enrollment office.\n\nToday Wislande did a 45-minute check.\n• Math: she starts at a grade 6–7 level. She is strong in fractions and is working on negative numbers.\n• Reading in Creole: she reads well (level 3 of 4).\n\nPlacement: grade 10, with English for newcomers and a math class with support.\nWe will review the placement in 30 days.\n\nQuestions? Reply to this message. Dana will answer you.",r:"Thank you very much. Can she also take French?"}
+  };
+  function setLang(k){document.getElementById('msg').textContent=msgs[k].m;document.getElementById('reply').textContent=msgs[k].r;
+    document.getElementById('lang-ht').setAttribute('aria-pressed',k==='ht');document.getElementById('lang-en').setAttribute('aria-pressed',k==='en')}
+  document.getElementById('lang-ht').onclick=function(){setLang('ht')};
+  document.getElementById('lang-en').onclick=function(){setLang('en')};
+  setLang('ht');
+
+  // review
+  var out=document.getElementById('rv-out');
+  function rv(t){out.textContent=t;out.hidden=false}
+  document.getElementById('rv-ok').onclick=function(){rv('Recorded: placement fits. João stays in Foundations of Algebra.')};
+  document.getElementById('rv-up').onclick=function(){rv('Flagged: move up. The counselor gets a task to review João for Algebra 1.')};
+  document.getElementById('rv-down').onclick=function(){rv('Flagged: needs more support. The counselor gets a task to add math tutoring.')};
+
+  // language bars
+  var langs=[['Spanish',14],["Haitian Creole",9],['Portuguese',7],["K'iche'",4],['Dari',3],['Arabic',3],['Other',2]];
+  document.getElementById('bars').innerHTML=langs.map(function(l){return '<div class="bar-row"><span>'+l[0]+'</span><span class="track"><span class="fill" style="display:block;width:'+(l[1]/14*100)+'%"></span></span><span class="mono">'+l[1]+'</span></div>'}).join('');
+
+  var start=idx((location.hash||'').slice(1)); show(start<0?0:start);
+})();
+</script>
+
+</html>

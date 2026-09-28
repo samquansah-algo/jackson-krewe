@@ -10,3 +10,6 @@ Analysis and recommendations for the venture idea. Items marked **(verify)** hav
 | [`red_team_review.md`](red_team_review.md) | Adversarial review of the problem definition, competitive analysis, and Mom Test interview; ranked solutions; next interviews; suggested rewrites |
 | [`data_infrastructure_assessment.md`](data_infrastructure_assessment.md) | Whether a centralized data system or "Statista for newcomers" makes sense, and the recommended intake-to-outcome data layer |
 | [`solution_landscape.md`](solution_landscape.md) | 18 possible solutions with evidence ratings, scoring, and a recommended solution stack |
+| [`pitch-kit/pitch_kit.md`](pitch-kit/pitch_kit.md) | **Waypoint pitch kit:** solution statement, 60-second pitch, user stories, user flow, Business Model Canvas, assumptions to test |
+| [`pitch-kit/prototype.html`](pitch-kit/prototype.html) | Clickable 9-screen prototype (open in a browser) |
+| [`pitch-kit/deck-source/`](pitch-kit/deck-source/) | Source files of the 12-slide pitch deck |
