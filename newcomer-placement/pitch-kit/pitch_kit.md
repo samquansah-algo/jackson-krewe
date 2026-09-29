@@ -156,18 +156,23 @@ A clickable prototype of the flow above, with 9 screens and sample data:
 
 A 12-slide deck, with the pitch script in the speaker notes: <https://claude.ai/artifact/71qxqXwRpMkrgPhjmi3FyL> (private until shared from its Share menu; it can be exported to PowerPoint or PDF).
 
-1. Waypoint: know where every newcomer starts
-2. The statistic: 38 percentage points
-3. The problem
-4. What we learned (customer discovery)
-5. The solution
-6. How it works (user flow)
-7. The product (profile)
-8. Who pays and why
-9. Competition
-10. Business model
-11. What we test next
-12. Team and ask
+**The pitch (one slide per required element, about 8 seconds each):**
+
+| # | Slide | Required element | What it says |
+|---|---|---|---|
+| 0 | Cover | — | Waypoint: know where every newcomer starts, in week one |
+| 1 | 38 points | Compelling statistic | Springfield vs. Boston 9th-grade placement gap |
+| 2 | The problem | Problem | Placement depends on the district; schools screen English, rarely math or home-language reading |
+| 3 | The solution | Solution | 45-minute in-school check: interview, home-language reading, visual math → three outputs |
+| 4 | The customer | Target customer / buyer | District multilingual directors (buyer); intake staff, counselors, teachers (users) |
+| 5 | The value | Value proposition | Placements they can defend in week one, for directors, counselors, families and students |
+| 6 | What we learned | Key learning | Self-paced tools go unfinished at home, so Waypoint runs in school with an adult |
+| 7 | What we test next | Next test | Will intake staff trust the results? Four assumptions, tests, and pass signals |
+| 8 | Ask | — | Introductions, a pilot school, prototype feedback |
+
+**Appendix, for questions:** the Starting-Point Profile, the user flow, the competition, and the Business Model Canvas.
+
+Each slide's speaker notes hold the exact pitch sentence(s) to say.
 
 ---
 
