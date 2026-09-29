@@ -31,23 +31,30 @@
 
 ---
 
-## 2. The 60-second pitch (~126 words, ~60 seconds at 125 wpm)
+## 2. The 60-second pitch (121 words, ~60 seconds)
 
-> In Massachusetts, older newcomers in Springfield are 38 percentage points more likely to start in ninth grade than similar students in Boston. Placement depends on the district, not the student. Schools screen English at enrollment but rarely check math or home-language reading. Waypoint is a 45-minute check run in school: a visual math screener, a home-language reading task, and a schooling-history interview. Counselors get a one-page profile; families get a summary in their language. We sell to district multilingual directors who need the right placement in week one, not semester two. A teacher we interviewed said i-Ready and Lexia fail when students use them alone at home, so Waypoint runs with an adult. Next, we'll test whether intake staff trust its results enough to pilot it.
+> In Massachusetts, older newcomers in Springfield are 38 percentage points more likely to be placed in ninth grade than similar newcomers in Boston. Placement depends on the district, not on what students know. Schools test English at enrollment but rarely math or home-language reading. Waypoint is a 45-minute check run in school: a visual math screener, a home-language reading task, and a schooling-history interview. We sell to district multilingual directors who need placements they can defend in week one. Counselors get a one-page profile; families get a summary in their language. A teacher told us i-Ready and Lexia go unfinished when students work alone at home, so Waypoint runs with an adult. Next, we'll test whether intake staff trust its results.
 
 **How it covers the Part 4 checklist**
 
-| Required element | Where it appears in the pitch |
+| Required element | Sentence in the pitch |
 |---|---|
-| Compelling statistic | "38 percentage points more likely to start in ninth grade" (Mantil et al., 2026) |
-| Problem | "Placement depends on the district, not the student… rarely check math or home-language reading" |
-| Solution | "45-minute check run in school: visual math screener, home-language reading task, schooling-history interview" |
-| Target customer / buyer | "District multilingual directors" |
-| Value proposition | "The right placement in week one, not semester two"; profile for counselors, summary for families |
-| Key learning from discovery | "i-Ready and Lexia fail when students use them alone at home, so Waypoint runs with an adult" |
-| What to test next | "Whether intake staff trust its results enough to pilot it" |
+| Compelling statistic | "In Massachusetts, older newcomers in Springfield are 38 percentage points more likely to be placed in ninth grade than similar newcomers in Boston." (Mantil et al., 2026) |
+| Problem | "Placement depends on the district, not on what students know. Schools test English at enrollment but rarely math or home-language reading." |
+| Solution | "Waypoint is a 45-minute check run in school: a visual math screener, a home-language reading task, and a schooling-history interview." |
+| Target customer / buyer | "We sell to district multilingual directors…" |
+| Value proposition | "…who need placements they can defend in week one. Counselors get a one-page profile; families get a summary in their language." |
+| Key learning from discovery | "A teacher told us i-Ready and Lexia go unfinished when students work alone at home, so Waypoint runs with an adult." |
+| What to test next | "Next, we'll test whether intake staff trust its results." |
 
-**Backup statistic** (from the team's problem definition, same source): about half of Massachusetts high school newcomers arrive at 16 or older, and only 15% of the cohort expected to graduate in 2024 left high school proficient in English.
+**Backup version (123 words)**, using the team's own statistics from the same source. Use it if the 38-point figure can't be confirmed before presenting:
+
+> About half of Massachusetts high school newcomers arrive at 16 or older, and only 15 percent of the 2024 cohort left high school proficient in English. These students have no time to lose, yet schools test English at enrollment and rarely check math or home-language reading. Waypoint is a 45-minute check run in school: a visual math screener, a home-language reading task, and a schooling-history interview. We sell to district multilingual directors who need placements they can defend in week one. Counselors get a one-page profile; families get a summary in their language. A teacher told us i-Ready and Lexia go unfinished when students work alone at home, so Waypoint runs with an adult. Next, we'll test whether intake staff trust its results.
+
+**Delivery:**
+- Pause after the statistic.
+- Slow down on "not on what students know."
+- If asked about next steps, give the concrete plan: 8–10 interviews with Massachusetts intake staff, then a 10–20 student pilot at one school.
 
 **Before presenting:** confirm the 38-point figure and its wording in *Land of Opportunity?* (Mantil et al., 2026). It was taken from press coverage of the report.
 
