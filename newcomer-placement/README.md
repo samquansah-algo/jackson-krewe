@@ -14,3 +14,5 @@ Analysis and recommendations for the venture idea. Items marked **(verify)** hav
 | [`pitch-kit/prototype.html`](pitch-kit/prototype.html) | Clickable 9-screen prototype (open in a browser) |
 | [`pitch-kit/deck-source/`](pitch-kit/deck-source/) | Source files of the 12-slide pitch deck |
 | [`pitch-kit/passage_pitch.md`](pitch-kit/passage_pitch.md) | **Current pitch (Passage):** story-led 60-second pitch, slide-by-element map, evidence table. The deck in `deck-source/` now follows this version. |
+| [`paso/Paso_MVP_Definition.md`](paso/Paso_MVP_Definition.md) | **Assignment 5, Step 1:** Paso MVP features, how we support each now, benefits, curve-jumping feature, MVP experience, what's not in the MVP |
+| [`paso/Paso_Competitive_Scan_MVP.xlsx`](paso/Paso_Competitive_Scan_MVP.xlsx) | **Assignment 5, Step 2:** competitive scan workbook (summary, Paso MVP, features and benefits matrix for WES, ECE, i-Ready, Ellevation, TalkingPoints and the status quo, competitor profiles, strategy canvas, sources) |
